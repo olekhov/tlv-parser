@@ -1,0 +1,9 @@
+var ALIASES = {};
+ALIASES["failure"] = {};
+ALIASES["failure_derive"] = {};
+ALIASES["proc_macro2"] = {};
+ALIASES["quote"] = {};
+ALIASES["syn"] = {};
+ALIASES["synstructure"] = {};
+ALIASES["tlv_parser"] = {};
+ALIASES["unicode_xid"] = {};
