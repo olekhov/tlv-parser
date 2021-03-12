@@ -282,7 +282,7 @@ impl Tlv {
     }
 
     /// Initializes Tlv object iterator of Vec<u8>
-    fn from_iter(iter: &mut dyn ExactSizeIterator<Item = &u8>) -> Result<Tlv> {
+    fn from_iter(iter: &mut dyn ExactSizeIterator<Item = &u8>, parse_constructed: bool) -> Result<Tlv> {
         let tag = Tlv::read_tag(iter)?;
         let len = Tlv::read_len(iter)?;
 
@@ -293,7 +293,7 @@ impl Tlv {
             val: Value::Nothing,
         };
 
-        if tlv.is_primitive() {
+        if tlv.is_primitive() || !parse_constructed {
             tlv.val = Value::Val(val.cloned().collect());
             return Ok(tlv);
         }
@@ -302,7 +302,7 @@ impl Tlv {
 
         while val.size_hint().0 != 0 {
             if let Value::TlvList(ref mut children) = tlv.val {
-                children.push(Tlv::from_iter(val)?);
+                children.push(Tlv::from_iter(val, parse_constructed)?);
             }
         }
 
@@ -322,7 +322,15 @@ impl Tlv {
     /// ```
     pub fn from_vec(slice: &[u8]) -> Result<Tlv> {
         let iter = &mut slice.iter();
-        Tlv::from_iter(iter)
+        Tlv::from_iter(iter, true)
+    }
+
+    /// Initializes Tlv object from [u8] slice
+    /// Does not parse constructed data. This basically means
+    /// that all TLVs are treated as primitive values
+    pub fn from_vec_np(slice: &[u8]) -> Result<Tlv> {
+        let iter = &mut slice.iter();
+        Tlv::from_iter(iter, false)
     }
 }
 
